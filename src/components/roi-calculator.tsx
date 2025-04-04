@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Slider } from "@/components/ui/slider"
 import { Card, CardContent } from "@/components/ui/card"
+import { ArrowRight } from "lucide-react"
 import ModuleSelector from "./ModuleSelector"
 
 export interface TimeSavingsData {
@@ -61,24 +62,27 @@ export default function RoiCalculator() {
   const weeklyTimeSavingsAreaManager = timeSavingsData.areaManagerCount * timeSavingsData.hoursPerWeekAreaManager
   const weeklyCostSavingsAreaManager = weeklyTimeSavingsAreaManager * timeSavingsData.hourlyRateAreaManager
   const annualCostSavingsAreaManager = weeklyCostSavingsAreaManager * 52
+  const annualTimeSavingsAreaManager = weeklyTimeSavingsAreaManager * 52
 
   // Calculate time savings for data analysts
   const weeklyTimeSavingsDataAnalyst = timeSavingsData.dataAnalystCount * timeSavingsData.hoursPerWeekDataAnalyst
   const weeklyCostSavingsDataAnalyst = weeklyTimeSavingsDataAnalyst * timeSavingsData.hourlyRateDataAnalyst
   const annualCostSavingsDataAnalyst = weeklyCostSavingsDataAnalyst * 52
+  const annualTimeSavingsDataAnalyst = weeklyTimeSavingsDataAnalyst * 52
 
   // Calculate total time and cost savings
   const weeklyTimeSavingsTotal = weeklyTimeSavingsAreaManager + weeklyTimeSavingsDataAnalyst
   const annualTimeSavingsTotal = weeklyTimeSavingsTotal * 52
   const annualCostSavingsTotal = annualCostSavingsAreaManager + annualCostSavingsDataAnalyst
 
-  // Calculate Loop costs based on selected modules
+  // Calculate Loop costs based on selected modules (hidden from UI but used for ROI)
   const loopCosts = calculateLoopCosts(timeSavingsData.numberOfDealers, selectedModules)
 
-  // Calculate ROI
-  const firstYearROI = ((annualCostSavingsTotal - loopCosts.firstYearTotal) / loopCosts.firstYearTotal) * 100
-  const ongoingAnnualROI = ((annualCostSavingsTotal - loopCosts.annualLicense) / loopCosts.annualLicense) * 100
-  const paybackPeriodMonths = loopCosts.firstYearTotal / (annualCostSavingsTotal / 12)
+  // Calculate ROI (still calculated but displayed differently)
+  const ongoingAnnualROI = ((annualCostSavingsTotal / loopCosts.annualLicense) * 100).toFixed(1)
+
+  // Format the ROI as "X.Xx"
+  const formattedROI = (annualCostSavingsTotal / loopCosts.annualLicense).toFixed(1) + "x"
 
   return (
     <TooltipProvider>
@@ -212,73 +216,71 @@ export default function RoiCalculator() {
           </div>
 
           <div className="space-y-6">
-            <Card>
+            <Card className="bg-slate-50 border-slate-200">
               <CardContent className="pt-6">
-                <h3 className="text-lg font-medium mb-4">Estimated Time Savings</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600">Area Manager Weekly Time Saved:</span>
-                    <span className="font-medium">{weeklyTimeSavingsAreaManager.toLocaleString()} hours</span>
+                <h3 className="text-2xl font-bold text-center mb-6">Total Estimated Annual Savings</h3>
+                <div className="text-5xl font-bold text-center text-green-500 mb-2">
+                  £{annualCostSavingsTotal.toLocaleString()}
+                </div>
+                <div className="text-center text-xl font-semibold mb-4">
+                  {formattedROI} ROI
+                </div>
+                <div className="text-center text-gray-600 mb-8">
+                  {annualTimeSavingsTotal.toLocaleString()} hours saved annually
+                </div>
+
+                <div className="space-y-8 mt-10">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-lg font-semibold">Report Creation Savings</h4>
+                      <p className="text-gray-600">{annualTimeSavingsDataAnalyst.toLocaleString()} hours saved annually</p>
+                    </div>
+                    <span className="text-xl font-semibold text-green-500">£{annualCostSavingsDataAnalyst.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600">Data Analyst Weekly Time Saved:</span>
-                    <span className="font-medium">{weeklyTimeSavingsDataAnalyst.toLocaleString()} hours</span>
-                  </div>
-                  <div className="flex justify-between items-center pt-2 border-t">
-                    <span className="text-slate-800 font-medium">Total Weekly Time Saved:</span>
-                    <span className="font-medium">{weeklyTimeSavingsTotal.toLocaleString()} hours</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600">Total Annual Time Saved:</span>
-                    <span className="font-medium">{annualTimeSavingsTotal.toLocaleString()} hours</span>
+                  
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-lg font-semibold">Visit Preparation Savings</h4>
+                      <p className="text-gray-600">{annualTimeSavingsAreaManager.toLocaleString()} hours saved annually</p>
+                    </div>
+                    <span className="text-xl font-semibold text-green-500">£{annualCostSavingsAreaManager.toLocaleString()}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white border">
               <CardContent className="pt-6">
-                <h3 className="text-lg font-medium mb-4">Estimated Cost Savings</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600">Area Manager Annual Savings:</span>
-                    <span className="font-medium">£{annualCostSavingsAreaManager.toLocaleString()}</span>
+                <h3 className="text-xl font-bold mb-4">Additional Benefits</h3>
+                <div className="space-y-6">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 p-2 bg-green-100 rounded-md mr-4">
+                      <ArrowRight className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold">Better Dealer Alignment</h4>
+                      <p className="text-gray-600">Standardised processes across all locations</p>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600">Data Analyst Annual Savings:</span>
-                    <span className="font-medium">£{annualCostSavingsDataAnalyst.toLocaleString()}</span>
+                  
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 p-2 bg-green-100 rounded-md mr-4">
+                      <ArrowRight className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold">Enhanced Reporting</h4>
+                      <p className="text-gray-600">Clear insights for strategic decisions</p>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center pt-2 border-t">
-                    <span className="text-slate-800 font-medium">Total Annual Cost Saved:</span>
-                    <span className="font-medium text-lg">£{annualCostSavingsTotal.toLocaleString()}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-emerald-50 border-emerald-100">
-              <CardContent className="pt-6">
-                <h3 className="text-lg font-medium mb-4">Return on Investment</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600">Loop Annual License:</span>
-                    <span className="font-medium">£{loopCosts.annualLicense.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600">First Year Total Cost:</span>
-                    <span className="font-medium">£{loopCosts.firstYearTotal.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between items-center pt-2 border-t">
-                    <span className="text-slate-800 font-medium">First Year ROI:</span>
-                    <span className="font-medium">{firstYearROI.toFixed(0)}%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-800 font-medium">Ongoing Annual ROI:</span>
-                    <span className="font-medium">{ongoingAnnualROI.toFixed(0)}%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-800 font-medium">Payback Period:</span>
-                    <span className="font-medium">{paybackPeriodMonths.toFixed(1)} months</span>
+                  
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 p-2 bg-green-100 rounded-md mr-4">
+                      <ArrowRight className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold">Real-time Visibility</h4>
+                      <p className="text-gray-600">Instant performance metrics across all dealers</p>
+                    </div>
                   </div>
                 </div>
               </CardContent>
