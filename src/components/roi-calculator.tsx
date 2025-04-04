@@ -9,12 +9,16 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./Cust
 import TimeSavingsTab from "./TimeSavingsTab"
 import PerformanceTab from "./PerformanceTab"
 import BusinessCaseTab from "./BusinessCaseTab"
+import ModuleSelector from "./ModuleSelector"
 
 export interface TimeSavingsData {
   numberOfDealers: number
-  staffCount: number
-  hoursPerWeek: number
-  hourlyRate: number
+  areaManagerCount: number
+  dataAnalystCount: number
+  hoursPerWeekAreaManager: number
+  hoursPerWeekDataAnalyst: number
+  hourlyRateAreaManager: number
+  hourlyRateDataAnalyst: number
 }
 
 export interface PerformanceData {
@@ -23,14 +27,34 @@ export interface PerformanceData {
   improvementPercentage: number
 }
 
+export interface Module {
+  id: string
+  name: string
+  required?: boolean
+}
+
 export default function RoiCalculator() {
   const [activeTab, setActiveTab] = useState("time-savings")
   
+  const availableModules: Module[] = [
+    { id: "core", name: "Core Platform", required: true },
+    { id: "dashboard", name: "Dashboard" },
+    { id: "scorecard", name: "Scorecard" },
+    { id: "action", name: "Action Centre" },
+    { id: "visits", name: "Visits" },
+    { id: "surveys", name: "Surveys" },
+  ]
+  
+  const [selectedModules, setSelectedModules] = useState<string[]>(["core", "scorecard"])
+  
   const [timeSavingsData, setTimeSavingsData] = useState<TimeSavingsData>({
     numberOfDealers: 50,
-    staffCount: 3,
-    hoursPerWeek: 4,
-    hourlyRate: 25,
+    areaManagerCount: 10,
+    dataAnalystCount: 3,
+    hoursPerWeekAreaManager: 4,
+    hoursPerWeekDataAnalyst: 8,
+    hourlyRateAreaManager: 35,
+    hourlyRateDataAnalyst: 25,
   })
 
   const [performanceData, setPerformanceData] = useState<PerformanceData>({
@@ -59,24 +83,30 @@ export default function RoiCalculator() {
   }, [performanceData.numberOfDealers, timeSavingsData.numberOfDealers])
 
   // Calculate annual time savings
-  const weeklyTimeSavings = timeSavingsData.numberOfDealers * timeSavingsData.staffCount * timeSavingsData.hoursPerWeek
-  const weeklyCostSavings = weeklyTimeSavings * timeSavingsData.hourlyRate
+  const weeklyTimeSavingsAreaManager = timeSavingsData.areaManagerCount * timeSavingsData.hoursPerWeekAreaManager
+  const weeklyTimeSavingsDataAnalyst = timeSavingsData.dataAnalystCount * timeSavingsData.hoursPerWeekDataAnalyst
+  const weeklyCostSavingsAreaManager = weeklyTimeSavingsAreaManager * timeSavingsData.hourlyRateAreaManager
+  const weeklyCostSavingsDataAnalyst = weeklyTimeSavingsDataAnalyst * timeSavingsData.hourlyRateDataAnalyst
+  const weeklyCostSavings = weeklyCostSavingsAreaManager + weeklyCostSavingsDataAnalyst
   const annualTimeSavings = weeklyCostSavings * 52
 
   // Calculate annual performance improvement
   const totalAnnualRevenue = performanceData.numberOfDealers * performanceData.averageRevenue
   const annualPerformanceImprovement = totalAnnualRevenue * (performanceData.improvementPercentage / 100)
 
-  // Calculate costs (assume we're using core, scorecard modules)
-  const selectedModules = ["core", "scorecard"]
+  // Calculate costs based on selected modules
   const loopCosts = calculateLoopCosts(timeSavingsData.numberOfDealers, selectedModules)
+
+  const handleModuleChange = (modules: string[]) => {
+    setSelectedModules(modules)
+  }
 
   return (
     <TooltipProvider>
       <div className="bg-white rounded-lg shadow-md p-6 max-w-6xl mx-auto">
         <div className="mb-8">
           <div className="flex items-center mb-2">
-            <h2 className="text-2xl font-bold mr-2">Loop ROI Calculator</h2>
+            <h1 className="text-3xl font-bold mr-2">Loop ROI Calculator</h1>
             <Tooltip>
               <TooltipTrigger asChild>
                 <button className="text-slate-500 hover:text-slate-700">
@@ -90,9 +120,15 @@ export default function RoiCalculator() {
               </TooltipContent>
             </Tooltip>
           </div>
-          <p className="text-slate-600">
-            Calculate the potential return on investment for implementing Loop's Balanced Scorecard solution.
+          <p className="text-slate-600 mb-6">
+            Estimate the business value you could achieve by using the Loop Enterprise Platform.
           </p>
+          
+          <ModuleSelector 
+            availableModules={availableModules} 
+            selectedModules={selectedModules} 
+            onChange={handleModuleChange} 
+          />
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -117,6 +153,7 @@ export default function RoiCalculator() {
               annualTimeSavings={annualTimeSavings}
               annualPerformanceImprovement={annualPerformanceImprovement}
               loopCosts={loopCosts}
+              selectedModules={selectedModules}
             />
           </TabsContent>
         </Tabs>

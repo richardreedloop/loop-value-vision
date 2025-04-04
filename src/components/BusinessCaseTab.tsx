@@ -12,6 +12,7 @@ interface BusinessCaseTabProps {
   annualTimeSavings: number
   annualPerformanceImprovement: number
   loopCosts: LoopCosts
+  selectedModules: string[]
 }
 
 export default function BusinessCaseTab({
@@ -20,11 +21,31 @@ export default function BusinessCaseTab({
   annualTimeSavings,
   annualPerformanceImprovement,
   loopCosts,
+  selectedModules,
 }: BusinessCaseTabProps) {
   const totalAnnualBenefit = annualTimeSavings + annualPerformanceImprovement
   const firstYearROI = ((totalAnnualBenefit - loopCosts.firstYearTotal) / loopCosts.firstYearTotal) * 100
   const ongoingAnnualROI = ((totalAnnualBenefit - loopCosts.annualLicense) / loopCosts.annualLicense) * 100
   const paybackPeriodMonths = loopCosts.setupFee / (totalAnnualBenefit / 12)
+  
+  // Format module names for display
+  const getModuleName = (id: string): string => {
+    const moduleMap: Record<string, string> = {
+      core: "Core Platform",
+      dashboard: "Dashboard",
+      scorecard: "Scorecard",
+      action: "Action Centre", 
+      visits: "Visits",
+      surveys: "Surveys"
+    }
+    return moduleMap[id] || id
+  }
+
+  // Calculate total weekly hours saved
+  const weeklyHoursSavedAreaManager = timeSavingsData.areaManagerCount * timeSavingsData.hoursPerWeekAreaManager
+  const weeklyHoursSavedDataAnalyst = timeSavingsData.dataAnalystCount * timeSavingsData.hoursPerWeekDataAnalyst
+  const totalWeeklyHoursSaved = weeklyHoursSavedAreaManager + weeklyHoursSavedDataAnalyst
+  const totalAnnualHoursSaved = totalWeeklyHoursSaved * 52
 
   return (
     <div className="space-y-8">
@@ -53,6 +74,20 @@ export default function BusinessCaseTab({
                   <span className="text-slate-800 font-medium">Total Annual Benefit:</span>
                   <span className="font-bold text-lg">£{totalAnnualBenefit.toLocaleString()}</span>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <h3 className="text-lg font-medium mb-4">Selected Modules</h3>
+              <div className="space-y-2">
+                {selectedModules.map(moduleId => (
+                  <div key={moduleId} className="flex items-center">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    <span>{getModuleName(moduleId)}</span>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -111,23 +146,17 @@ export default function BusinessCaseTab({
             <CardContent className="pt-6">
               <h3 className="text-lg font-medium mb-4">Summary</h3>
               <p className="text-slate-700 mb-4">
-                Based on your inputs, implementing Loop's Balanced Scorecard solution for{" "}
+                Based on your inputs, implementing Loop's solution for{" "}
                 {timeSavingsData.numberOfDealers} dealers would:
               </p>
               <ul className="space-y-2 list-disc pl-5 text-slate-700">
                 <li>
-                  Save{" "}
-                  {(
-                    timeSavingsData.numberOfDealers *
-                    timeSavingsData.staffCount *
-                    timeSavingsData.hoursPerWeek *
-                    52
-                  ).toLocaleString()}{" "}
-                  hours annually
+                  Save {totalAnnualHoursSaved.toLocaleString()} hours annually ({weeklyHoursSavedAreaManager.toLocaleString()} hours for Area Managers, {weeklyHoursSavedDataAnalyst.toLocaleString()} hours for Data Analysts)
                 </li>
                 <li>Generate £{annualPerformanceImprovement.toLocaleString()} in additional revenue</li>
                 <li>Provide a {firstYearROI.toFixed(0)}% ROI in the first year</li>
                 <li>Pay for itself in {paybackPeriodMonths.toFixed(1)} months</li>
+                <li>Utilize {selectedModules.length} Loop modules</li>
               </ul>
             </CardContent>
           </Card>
