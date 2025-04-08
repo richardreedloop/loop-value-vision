@@ -26,7 +26,6 @@ export default function BusinessCaseTab({
   const totalAnnualBenefit = annualTimeSavings + annualPerformanceImprovement
   const firstYearROI = ((totalAnnualBenefit - loopCosts.firstYearTotal) / loopCosts.firstYearTotal) * 100
   const ongoingAnnualROI = ((totalAnnualBenefit - loopCosts.annualLicense) / loopCosts.annualLicense) * 100
-  const paybackPeriodMonths = loopCosts.setupFee / (totalAnnualBenefit / 12)
   
   // Format module names for display
   const getModuleName = (id: string): string => {
@@ -42,9 +41,8 @@ export default function BusinessCaseTab({
   }
 
   // Calculate total weekly hours saved
-  const weeklyHoursSavedAreaManager = timeSavingsData.areaManagerCount * timeSavingsData.hoursPerWeekAreaManager
   const weeklyHoursSavedDataAnalyst = timeSavingsData.dataAnalystCount * timeSavingsData.hoursPerWeekDataAnalyst
-  const totalWeeklyHoursSaved = weeklyHoursSavedAreaManager + weeklyHoursSavedDataAnalyst
+  const totalWeeklyHoursSaved = weeklyHoursSavedDataAnalyst
   const totalAnnualHoursSaved = totalWeeklyHoursSaved * 52
 
   return (
@@ -91,26 +89,6 @@ export default function BusinessCaseTab({
               </div>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-medium mb-4">Loop Investment</h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">One-time Setup Fee:</span>
-                  <span className="font-medium">£{loopCosts.setupFee.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Annual License Fee:</span>
-                  <span className="font-medium">£{loopCosts.annualLicense.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center pt-2 border-t">
-                  <span className="text-slate-800 font-medium">First Year Total Cost:</span>
-                  <span className="font-bold">£{loopCosts.firstYearTotal.toLocaleString()}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         <div className="space-y-4">
@@ -133,11 +111,6 @@ export default function BusinessCaseTab({
                     {ongoingAnnualROI > 0 && <ArrowRight className="ml-2 text-emerald-500" />}
                   </div>
                 </div>
-
-                <div className="flex flex-col">
-                  <span className="text-slate-600 mb-1">Payback Period:</span>
-                  <span className="text-2xl font-bold">{paybackPeriodMonths.toFixed(1)} months</span>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -150,12 +123,9 @@ export default function BusinessCaseTab({
                 {timeSavingsData.numberOfDealers} dealers would:
               </p>
               <ul className="space-y-2 list-disc pl-5 text-slate-700">
-                <li>
-                  Save {totalAnnualHoursSaved.toLocaleString()} hours annually ({weeklyHoursSavedAreaManager.toLocaleString()} hours for Area Managers, {weeklyHoursSavedDataAnalyst.toLocaleString()} hours for Data Analysts)
-                </li>
+                <li>Save {totalAnnualHoursSaved.toLocaleString()} hours annually</li>
                 <li>Generate £{annualPerformanceImprovement.toLocaleString()} in additional revenue</li>
                 <li>Provide a {firstYearROI.toFixed(0)}% ROI in the first year</li>
-                <li>Pay for itself in {paybackPeriodMonths.toFixed(1)} months</li>
                 <li>Utilize {selectedModules.length} Loop modules</li>
               </ul>
             </CardContent>
