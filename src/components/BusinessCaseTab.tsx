@@ -3,7 +3,7 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Calendar } from "lucide-react"
+import { ArrowRight, Calendar, Video } from "lucide-react"
 import type { TimeSavingsData, PerformanceData } from "./roi-calculator"
 import type { LoopCosts } from "@/lib/cost-calculator"
 
@@ -28,19 +28,6 @@ export default function BusinessCaseTab({
   const firstYearROI = ((totalAnnualBenefit - loopCosts.firstYearTotal) / loopCosts.firstYearTotal) * 100
   const ongoingAnnualROI = ((totalAnnualBenefit - loopCosts.annualLicense) / loopCosts.annualLicense) * 100
   
-  // Format module names for display
-  const getModuleName = (id: string): string => {
-    const moduleMap: Record<string, string> = {
-      core: "Core Platform",
-      dashboard: "Dashboard",
-      scorecard: "Scorecard",
-      action: "Action Centre", 
-      visits: "Visits",
-      surveys: "Surveys"
-    }
-    return moduleMap[id] || id
-  }
-
   // Calculate total weekly hours saved
   const weeklyHoursSavedDataAnalyst = timeSavingsData.dataAnalystCount * timeSavingsData.hoursPerWeekDataAnalyst
   const totalWeeklyHoursSaved = weeklyHoursSavedDataAnalyst
@@ -50,6 +37,12 @@ export default function BusinessCaseTab({
     // In a real app, this would open a calendar booking page or form
     window.open("https://loop.so/book-meeting", "_blank");
     console.log("Book a meeting clicked");
+  }
+
+  const handleWatchVideo = () => {
+    // In a real app, this would open a video player or redirect to a video page
+    window.open("https://loop.so/scorecard-demo", "_blank");
+    console.log("Watch video clicked");
   }
 
   return (
@@ -79,20 +72,6 @@ export default function BusinessCaseTab({
                   <span className="text-slate-800 font-medium">Total Annual Benefit:</span>
                   <span className="font-bold text-lg">£{totalAnnualBenefit.toLocaleString()}</span>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-medium mb-4">Selected Modules</h3>
-              <div className="space-y-2">
-                {selectedModules.map(moduleId => (
-                  <div key={moduleId} className="flex items-center">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                    <span>{getModuleName(moduleId)}</span>
-                  </div>
-                ))}
               </div>
             </CardContent>
           </Card>
@@ -133,17 +112,21 @@ export default function BusinessCaseTab({
                 <li>Save {totalAnnualHoursSaved.toLocaleString()} hours annually</li>
                 <li>Generate £{annualPerformanceImprovement.toLocaleString()} in additional revenue</li>
                 <li>Provide a {firstYearROI.toFixed(0)}% ROI in the first year</li>
-                <li>Utilize {selectedModules.length} Loop modules</li>
               </ul>
             </CardContent>
           </Card>
         </div>
       </div>
 
-      <div className="flex justify-center mt-12">
-        <Button onClick={handleBookMeeting} size="lg" className="bg-emerald-600 hover:bg-emerald-700">
+      <div className="flex flex-col md:flex-row justify-center gap-4 mt-12">
+        <Button onClick={handleBookMeeting} size="lg" className="bg-[#011d29] hover:bg-[#011d29]/90">
           <Calendar className="mr-2" />
           Book a Meeting to Learn More
+        </Button>
+        
+        <Button onClick={handleWatchVideo} size="lg" variant="outline" className="border-[#33b7b9] text-[#33b7b9] hover:bg-[#33b7b9]/10">
+          <Video className="mr-2" />
+          Watch Scorecard Demo
         </Button>
       </div>
     </div>

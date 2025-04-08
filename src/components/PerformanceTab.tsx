@@ -36,7 +36,7 @@ export default function PerformanceTab({ data, onChange, onNext }: PerformanceTa
       <div>
         <h2 className="text-2xl font-bold mb-4">Performance Improvement Calculator</h2>
         <p className="text-slate-600 mb-6">
-          Estimate the revenue improvement from implementing Loop's Balanced Scorecard solution.
+          Estimate the annual incremental revenue improvement from implementing Loop's Balanced Scorecard solution.
         </p>
       </div>
 
@@ -72,7 +72,7 @@ export default function PerformanceTab({ data, onChange, onNext }: PerformanceTa
 
           <div className="space-y-2">
             <div className="flex justify-between">
-              <Label htmlFor="improvementPercentage">Performance Improvement: {localData.improvementPercentage}%</Label>
+              <Label htmlFor="improvementPercentage">Annual Performance Improvement: {localData.improvementPercentage}%</Label>
             </div>
             <Slider
               id="improvementPercentage"
@@ -83,7 +83,7 @@ export default function PerformanceTab({ data, onChange, onNext }: PerformanceTa
               onValueChange={(value) => handleChange("improvementPercentage", value[0])}
             />
             <p className="text-sm text-slate-500">
-              Based on case studies, Loop customers typically see a 1-3% improvement in performance.
+              Based on case studies, Loop customers typically see a 1-3% annual incremental improvement in performance.
             </p>
           </div>
         </div>
@@ -91,14 +91,14 @@ export default function PerformanceTab({ data, onChange, onNext }: PerformanceTa
         <div className="space-y-4">
           <Card>
             <CardContent className="pt-6">
-              <h3 className="text-lg font-medium mb-4">Estimated Revenue Impact</h3>
+              <h3 className="text-lg font-medium mb-4">Estimated Annual Revenue Impact</h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-slate-600">Total Annual Revenue:</span>
                   <span className="font-medium">£{totalAnnualRevenue.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Improvement Per Dealer:</span>
+                  <span className="text-slate-600">Annual Improvement Per Dealer:</span>
                   <span className="font-medium">£{perDealerImprovement.toLocaleString()}</span>
                 </div>
               </div>
@@ -110,11 +110,11 @@ export default function PerformanceTab({ data, onChange, onNext }: PerformanceTa
               <h3 className="text-lg font-medium mb-4">Annual Performance Improvement</h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Total Annual Improvement:</span>
+                  <span className="text-slate-600">Total Annual Incremental Improvement:</span>
                   <span className="font-medium text-lg">£{annualImprovement.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Improvement Percentage:</span>
+                  <span className="text-slate-600">Annual Improvement Percentage:</span>
                   <span className="font-medium">{localData.improvementPercentage}%</span>
                 </div>
               </div>
@@ -124,7 +124,7 @@ export default function PerformanceTab({ data, onChange, onNext }: PerformanceTa
       </div>
 
       <div className="flex justify-end mt-8">
-        <Button onClick={onNext} className="bg-blue-600 hover:bg-blue-700">
+        <Button onClick={onNext} className="bg-[#011d29] hover:bg-[#011d29]/90">
           Next: Business Case <ArrowRight className="ml-2" />
         </Button>
       </div>

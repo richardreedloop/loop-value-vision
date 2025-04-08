@@ -167,7 +167,7 @@ export default function TimeSavingsTab({ data, onChange, onNext }: TimeSavingsTa
       </div>
       
       <div className="flex justify-end mt-8">
-        <Button onClick={onNext} className="bg-blue-600 hover:bg-blue-700">
+        <Button onClick={onNext} className="bg-[#011d29] hover:bg-[#011d29]/90">
           Next: Performance Improvement <ArrowRight className="ml-2" />
         </Button>
       </div>
