@@ -7,13 +7,16 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Slider } from "@/components/ui/slider"
 import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { ArrowRight } from "lucide-react"
 
 interface TimeSavingsTabProps {
   data: TimeSavingsData
   onChange: (data: TimeSavingsData) => void
+  onNext: () => void
 }
 
-export default function TimeSavingsTab({ data, onChange }: TimeSavingsTabProps) {
+export default function TimeSavingsTab({ data, onChange, onNext }: TimeSavingsTabProps) {
   const [localData, setLocalData] = useState<TimeSavingsData>(data)
 
   useEffect(() => {
@@ -161,6 +164,12 @@ export default function TimeSavingsTab({ data, onChange }: TimeSavingsTabProps) 
             </CardContent>
           </Card>
         </div>
+      </div>
+      
+      <div className="flex justify-end mt-8">
+        <Button onClick={onNext} className="bg-blue-600 hover:bg-blue-700">
+          Next: Performance Improvement <ArrowRight className="ml-2" />
+        </Button>
       </div>
     </div>
   )

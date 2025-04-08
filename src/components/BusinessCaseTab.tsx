@@ -2,7 +2,8 @@
 "use client"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { ArrowRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { ArrowRight, Calendar } from "lucide-react"
 import type { TimeSavingsData, PerformanceData } from "./roi-calculator"
 import type { LoopCosts } from "@/lib/cost-calculator"
 
@@ -44,6 +45,12 @@ export default function BusinessCaseTab({
   const weeklyHoursSavedDataAnalyst = timeSavingsData.dataAnalystCount * timeSavingsData.hoursPerWeekDataAnalyst
   const totalWeeklyHoursSaved = weeklyHoursSavedDataAnalyst
   const totalAnnualHoursSaved = totalWeeklyHoursSaved * 52
+
+  const handleBookMeeting = () => {
+    // In a real app, this would open a calendar booking page or form
+    window.open("https://loop.so/book-meeting", "_blank");
+    console.log("Book a meeting clicked");
+  }
 
   return (
     <div className="space-y-8">
@@ -131,6 +138,13 @@ export default function BusinessCaseTab({
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      <div className="flex justify-center mt-12">
+        <Button onClick={handleBookMeeting} size="lg" className="bg-emerald-600 hover:bg-emerald-700">
+          <Calendar className="mr-2" />
+          Book a Meeting to Learn More
+        </Button>
       </div>
     </div>
   )

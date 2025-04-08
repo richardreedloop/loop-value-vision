@@ -6,14 +6,17 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Slider } from "@/components/ui/slider"
 import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { ArrowRight } from "lucide-react"
 import type { PerformanceData } from "./roi-calculator"
 
 interface PerformanceTabProps {
   data: PerformanceData
   onChange: (data: PerformanceData) => void
+  onNext: () => void
 }
 
-export default function PerformanceTab({ data, onChange }: PerformanceTabProps) {
+export default function PerformanceTab({ data, onChange, onNext }: PerformanceTabProps) {
   const [localData, setLocalData] = useState<PerformanceData>(data)
 
   useEffect(() => {
@@ -118,6 +121,12 @@ export default function PerformanceTab({ data, onChange }: PerformanceTabProps) 
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      <div className="flex justify-end mt-8">
+        <Button onClick={onNext} className="bg-blue-600 hover:bg-blue-700">
+          Next: Business Case <ArrowRight className="ml-2" />
+        </Button>
       </div>
     </div>
   )

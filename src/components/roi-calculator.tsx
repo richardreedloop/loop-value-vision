@@ -14,7 +14,6 @@ export interface TimeSavingsData {
   dataAnalystCount: number
   hoursPerWeekDataAnalyst: number
   hourlyRateDataAnalyst: number
-  numberOfDealers: number
   areaManagerCount: number
   hoursPerWeekAreaManager: number
   hourlyRateAreaManager: number
@@ -41,6 +40,7 @@ export interface Module {
 }
 
 export default function RoiCalculator() {
+  const [activeTab, setActiveTab] = useState("timeSavings")
   const [selectedModules] = useState<string[]>(["core", "scorecard"])
   
   const [scorecardData, setScoreCardData] = useState<ScoreCardData>({
@@ -82,6 +82,20 @@ export default function RoiCalculator() {
   // Get Loop costs for business case
   const loopCosts = calculateLoopCosts(scorecardData.numberOfDealers, selectedModules)
 
+  // Function to handle tab navigation
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  }
+
+  // Function to navigate to the next tab
+  const goToNextTab = () => {
+    if (activeTab === "timeSavings") {
+      setActiveTab("performance");
+    } else if (activeTab === "performance") {
+      setActiveTab("businessCase");
+    }
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6 max-w-6xl mx-auto">
       <div className="mb-6">
@@ -91,7 +105,7 @@ export default function RoiCalculator() {
         </p>
       </div>
 
-      <Tabs defaultValue="timeSavings" className="w-full">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-8">
           <TabsTrigger value="timeSavings">Time Savings</TabsTrigger>
           <TabsTrigger value="performance">Performance Improvement</TabsTrigger>
@@ -102,6 +116,7 @@ export default function RoiCalculator() {
           <TimeSavingsTab 
             data={timeSavingsData} 
             onChange={setTimeSavingsData}
+            onNext={goToNextTab}
           />
         </TabsContent>
         
@@ -109,6 +124,7 @@ export default function RoiCalculator() {
           <PerformanceTab 
             data={performanceData} 
             onChange={setPerformanceData}
+            onNext={goToNextTab}
           />
         </TabsContent>
         
