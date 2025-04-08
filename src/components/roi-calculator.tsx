@@ -39,9 +39,10 @@ export default function RoiCalculator() {
   // Calculate cost savings (based on annual cost)
   const annualCostSavings = scorecardData.annualCost * 0.85 // Assume 85% cost savings
   
-  // Calculate ROI (still calculated but displayed differently)
+  // Calculate ROI based on the formula: people × hours × annual cost / cost of Loop
   const loopCosts = calculateLoopCosts(scorecardData.numberOfDealers, selectedModules)
-  const formattedROI = (annualCostSavings / loopCosts.annualLicense).toFixed(1) + "x"
+  const roi = (scorecardData.peopleCount * scorecardData.hoursPerMonth * scorecardData.annualCost) / loopCosts.annualLicense
+  const formattedROI = roi.toFixed(1) + "x"
 
   // Calculate breakdown of savings
   const reportGenerationSavings = annualHoursSaved * 0.6 // 60% of time savings
