@@ -1,12 +1,13 @@
 
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { calculateLoopCosts } from "@/lib/cost-calculator"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import TimeSavingsTab from "./TimeSavingsTab"
 import PerformanceTab from "./PerformanceTab"
 import BusinessCaseTab from "./BusinessCaseTab"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 // Define types for use in the tabs
 export interface TimeSavingsData {
@@ -39,6 +40,8 @@ export interface Module {
 export default function RoiCalculator() {
   const [activeTab, setActiveTab] = useState("timeSavings")
   const [selectedModules] = useState<string[]>(["core", "scorecard"])
+  const containerRef = useRef<HTMLDivElement>(null)
+  const isMobile = useIsMobile()
   
   const [scorecardData, setScoreCardData] = useState<ScoreCardData>({
     numberOfLocations: 50,
@@ -76,6 +79,10 @@ export default function RoiCalculator() {
   // Function to handle tab navigation
   const handleTabChange = (value: string) => {
     setActiveTab(value);
+    // Scroll to the top of the container
+    if (containerRef.current) {
+      containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   // Function to navigate to the next tab
@@ -85,10 +92,15 @@ export default function RoiCalculator() {
     } else if (activeTab === "performance") {
       setActiveTab("businessCase");
     }
+    
+    // Scroll to the top of the container
+    if (containerRef.current) {
+      containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 max-w-6xl mx-auto">
+    <div ref={containerRef} className="bg-white rounded-lg shadow-md p-6 max-w-6xl mx-auto">
       <div className="mb-6">
         <h2 className="text-2xl font-bold mb-2">Loop ROI Calculator</h2>
         <p className="text-slate-600">
@@ -97,7 +109,7 @@ export default function RoiCalculator() {
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-8">
+        <TabsList className={`grid w-full ${isMobile ? "grid-cols-1 gap-2" : "grid-cols-3"} mb-8`}>
           <TabsTrigger value="timeSavings">Time Savings</TabsTrigger>
           <TabsTrigger value="performance">Performance Improvement</TabsTrigger>
           <TabsTrigger value="businessCase">Business Case</TabsTrigger>
