@@ -178,22 +178,29 @@ export default function BusinessCaseTab({
           </Card>
         </div>
 
-        {/* Right column - Benefits & ROI Analysis - Height matched to left column */}
+        {/* Right column - ROI Analysis - Height matched to left column */}
         <div className="h-full">
           <Card className="h-full">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Annual Benefits &amp; ROI</CardTitle>
+              <CardTitle className="text-lg">ROI</CardTitle>
             </CardHeader>
             <CardContent>
-              {/* Time Savings Section with Hours */}
+              {/* Hours Saved Section */}
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between items-center p-3 bg-slate-50 rounded-md">
                   <div>
-                    <span className="font-medium block">Time Savings</span>
-                    <span className="text-xs text-slate-500">
-                      {totalMonthlyHoursSaved.toFixed(0)} hrs/month | {totalAnnualHoursSaved.toLocaleString()} hrs/year
-                    </span>
+                    <span className="font-medium block">Monthly Hours Saved</span>
                   </div>
+                  <span className="font-bold">{totalMonthlyHoursSaved.toFixed(0)} hrs</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-slate-50 rounded-md">
+                  <div>
+                    <span className="font-medium block">Annual Hours Saved</span>
+                  </div>
+                  <span className="font-bold">{totalAnnualHoursSaved.toLocaleString()} hrs</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-slate-50 rounded-md">
+                  <span className="font-medium">Time Savings Value</span>
                   <span className="font-bold">£{annualTimeSavings.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-slate-50 rounded-md">
