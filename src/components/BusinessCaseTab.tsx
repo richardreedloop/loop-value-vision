@@ -11,7 +11,7 @@ import {
   ChartTooltip, 
   ChartTooltipContent 
 } from "@/components/ui/chart"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, BarChart, Bar } from "recharts"
 import { useIsMobile } from "@/hooks/use-mobile"
 
 interface BusinessCaseTabProps {
@@ -38,7 +38,15 @@ export default function BusinessCaseTab({
   // Calculate total weekly hours saved
   const weeklyHoursSavedDataAnalyst = timeSavingsData.dataAnalystCount * timeSavingsData.hoursPerWeekDataAnalyst
   const totalWeeklyHoursSaved = weeklyHoursSavedDataAnalyst
+  const totalMonthlyHoursSaved = totalWeeklyHoursSaved * 4.33 // Average weeks per month
   const totalAnnualHoursSaved = totalWeeklyHoursSaved * 52
+
+  // Get ROI color based on percentage
+  const getRoiColor = (roiPercentage: number) => {
+    if (roiPercentage < 0) return "text-red-600 bg-red-50"
+    if (roiPercentage < 100) return "text-orange-600 bg-orange-50"
+    return "text-emerald-600 bg-emerald-50"
+  }
 
   // Chart config for area chart - cumulative savings
   const areaChartData = [
@@ -56,10 +64,56 @@ export default function BusinessCaseTab({
     { month: 'Dec', savings: totalAnnualBenefit },
   ];
 
+  // Hours saved across a year chart data
+  const hoursChartData = [
+    { month: 'Jan', hours: totalAnnualHoursSaved / 12 },
+    { month: 'Feb', hours: (totalAnnualHoursSaved / 12) * 2 },
+    { month: 'Mar', hours: (totalAnnualHoursSaved / 12) * 3 },
+    { month: 'Apr', hours: (totalAnnualHoursSaved / 12) * 4 },
+    { month: 'May', hours: (totalAnnualHoursSaved / 12) * 5 },
+    { month: 'Jun', hours: (totalAnnualHoursSaved / 12) * 6 },
+    { month: 'Jul', hours: (totalAnnualHoursSaved / 12) * 7 },
+    { month: 'Aug', hours: (totalAnnualHoursSaved / 12) * 8 },
+    { month: 'Sep', hours: (totalAnnualHoursSaved / 12) * 9 },
+    { month: 'Oct', hours: (totalAnnualHoursSaved / 12) * 10 },
+    { month: 'Nov', hours: (totalAnnualHoursSaved / 12) * 11 },
+    { month: 'Dec', hours: totalAnnualHoursSaved },
+  ];
+
+  // Revenue comparison data
+  const baseRevenue = performanceData.numberOfLocations * performanceData.averageRevenue;
+  const improvedRevenue = baseRevenue + annualPerformanceImprovement;
+  
+  const revenueComparisonData = [
+    { 
+      category: "Annual Revenue", 
+      "Without Loop": baseRevenue, 
+      "With Loop": improvedRevenue 
+    }
+  ];
+
   const areaChartConfig = {
     savings: {
       label: "Cumulative Savings",
       color: "#33b7b9",
+    },
+  } satisfies ChartConfig
+
+  const hoursChartConfig = {
+    hours: {
+      label: "Cumulative Hours Saved",
+      color: "#011d29",
+    },
+  } satisfies ChartConfig
+
+  const revenueChartConfig = {
+    "Without Loop": {
+      label: "Without Loop",
+      color: "#011d29",
+    },
+    "With Loop": {
+      label: "With Loop",
+      color: "#22F6AC",
     },
   } satisfies ChartConfig
 
@@ -124,21 +178,26 @@ export default function BusinessCaseTab({
           </Card>
         </div>
 
-        {/* Right column - Benefits & ROI Analysis */}
-        <div className="space-y-6">
-          <Card>
+        {/* Right column - Benefits & ROI Analysis - Height matched to left column */}
+        <div className="h-full">
+          <Card className="h-full">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">Annual Benefits &amp; ROI</CardTitle>
             </CardHeader>
             <CardContent>
-              {/* Annual Benefits Section */}
+              {/* Time Savings Section with Hours */}
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between items-center p-3 bg-slate-50 rounded-md">
-                  <span className="font-medium">Time Savings</span>
+                  <div>
+                    <span className="font-medium block">Time Savings</span>
+                    <span className="text-xs text-slate-500">
+                      {totalMonthlyHoursSaved.toFixed(0)} hrs/month | {totalAnnualHoursSaved.toLocaleString()} hrs/year
+                    </span>
+                  </div>
                   <span className="font-bold">£{annualTimeSavings.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-slate-50 rounded-md">
-                  <span className="font-medium">Performance Improvement</span>
+                  <span className="font-medium">Annual Performance Improvement</span>
                   <span className="font-bold">£{annualPerformanceImprovement.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-emerald-50 rounded-md">
@@ -147,73 +206,126 @@ export default function BusinessCaseTab({
                 </div>
               </div>
 
-              {/* ROI Section */}
+              {/* ROI Section with dynamic colors */}
               <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-slate-50 rounded-md">
+                <div className={`flex justify-between items-center p-3 rounded-md ${getRoiColor(firstYearROI)}`}>
                   <span className="font-medium">First Year ROI</span>
                   <div className="flex items-center">
-                    <span className={`font-bold ${firstYearROI > 0 ? 'text-emerald-700' : 'text-red-600'}`}>
+                    <span className="font-bold">
                       {firstYearROI.toFixed(0)}%
                     </span>
-                    {firstYearROI > 0 && <TrendingUp className="ml-1 h-4 w-4 text-emerald-600" />}
+                    {firstYearROI > 0 && <TrendingUp className="ml-1 h-4 w-4" />}
                   </div>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-slate-50 rounded-md">
+                <div className={`flex justify-between items-center p-3 rounded-md ${getRoiColor(ongoingAnnualROI)}`}>
                   <span className="font-medium">Ongoing Annual ROI</span>
                   <div className="flex items-center">
-                    <span className={`font-bold ${ongoingAnnualROI > 0 ? 'text-emerald-700' : 'text-red-600'}`}>
+                    <span className="font-bold">
                       {ongoingAnnualROI.toFixed(0)}%
                     </span>
-                    {ongoingAnnualROI > 0 && <TrendingUp className="ml-1 h-4 w-4 text-emerald-600" />}
+                    {ongoingAnnualROI > 0 && <TrendingUp className="ml-1 h-4 w-4" />}
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Cumulative Savings Chart */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Cumulative Annual Savings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`h-${isMobile ? '60' : '80'}`}>
-                <ChartContainer config={areaChartConfig}>
-                  <AreaChart
-                    accessibilityLayer
-                    data={areaChartData}
-                    margin={{
-                      top: 20,
-                      right: 20,
-                      left: 20,
-                      bottom: 20,
-                    }}
-                    width={isMobile ? 300 : 500}
-                    height={isMobile ? 200 : 300}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" tick={{ fontSize: isMobile ? 10 : 12 }} />
-                    <YAxis tick={{ fontSize: isMobile ? 10 : 12 }} />
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                    <defs>
-                      <linearGradient id="fillSavings" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="var(--color-savings)" stopOpacity={0.8} />
-                        <stop offset="95%" stopColor="var(--color-savings)" stopOpacity={0.1} />
-                      </linearGradient>
-                    </defs>
-                    <Area
-                      dataKey="savings"
-                      type="monotone"
-                      fill="url(#fillSavings)"
-                      fillOpacity={0.6}
-                      stroke="var(--color-savings)"
-                    />
-                  </AreaChart>
-                </ChartContainer>
               </div>
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Charts Section - Full Width */}
+      <div className={`grid gap-6 ${isMobile ? "" : "md:grid-cols-2"}`}>
+        {/* Hours Saved Chart */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">Cumulative Hours Saved</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className={`h-${isMobile ? '60' : '80'}`}>
+              <ChartContainer config={hoursChartConfig}>
+                <AreaChart
+                  accessibilityLayer
+                  data={hoursChartData}
+                  margin={{
+                    top: 20,
+                    right: 20,
+                    left: 20,
+                    bottom: 20,
+                  }}
+                  width={isMobile ? 300 : 500}
+                  height={isMobile ? 200 : 300}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" tick={{ fontSize: isMobile ? 10 : 12 }} />
+                  <YAxis tick={{ fontSize: isMobile ? 10 : 12 }} />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                  <defs>
+                    <linearGradient id="fillHours" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--color-hours)" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="var(--color-hours)" stopOpacity={0.1} />
+                    </linearGradient>
+                  </defs>
+                  <Area
+                    dataKey="hours"
+                    type="monotone"
+                    fill="url(#fillHours)"
+                    fillOpacity={0.6}
+                    stroke="var(--color-hours)"
+                  />
+                </AreaChart>
+              </ChartContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Revenue Comparison Chart */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">Revenue Comparison</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className={`h-${isMobile ? '60' : '80'}`}>
+              <ChartContainer config={revenueChartConfig}>
+                <BarChart
+                  accessibilityLayer
+                  data={revenueComparisonData}
+                  margin={{
+                    top: 20,
+                    right: 20,
+                    left: 20,
+                    bottom: 20,
+                  }}
+                  width={isMobile ? 300 : 500}
+                  height={isMobile ? 200 : 300}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="category" tick={{ fontSize: isMobile ? 10 : 12 }} />
+                  <YAxis tick={{ fontSize: isMobile ? 10 : 12 }} tickFormatter={(value) => `£${(value / 1000000).toFixed(1)}M`} />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                  <defs>
+                    <linearGradient id="fillWithoutLoop" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#011d29" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#011d29" stopOpacity={0.1} />
+                    </linearGradient>
+                    <linearGradient id="fillWithLoop" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#22F6AC" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#22F6AC" stopOpacity={0.1} />
+                    </linearGradient>
+                  </defs>
+                  <Bar 
+                    dataKey="Without Loop" 
+                    fillOpacity={0.8} 
+                    fill="url(#fillWithoutLoop)" 
+                  />
+                  <Bar 
+                    dataKey="With Loop" 
+                    fillOpacity={0.8} 
+                    fill="url(#fillWithLoop)" 
+                  />
+                </BarChart>
+              </ChartContainer>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
