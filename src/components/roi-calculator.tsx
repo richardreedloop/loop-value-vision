@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useRef, useEffect } from "react"
@@ -13,8 +12,8 @@ import { useIsMobile } from "@/hooks/use-mobile"
 export interface TimeSavingsData {
   numberOfLocations: number
   dataAnalystCount: number
-  hoursPerWeekDataAnalyst: number
-  hourlyRateDataAnalyst: number
+  hoursPerMonthDataAnalyst: number
+  annualSalaryDataAnalyst: number
 }
 
 export interface PerformanceData {
@@ -50,42 +49,36 @@ export default function RoiCalculator() {
     annualCost: 75000,
   })
 
-  // Initialize time savings data
   const [timeSavingsData, setTimeSavingsData] = useState<TimeSavingsData>({
     numberOfLocations: 50,
     dataAnalystCount: 3,
-    hoursPerWeekDataAnalyst: 10,
-    hourlyRateDataAnalyst: 30
+    hoursPerMonthDataAnalyst: 40,
+    annualSalaryDataAnalyst: 60000
   })
 
-  // Initialize performance data
   const [performanceData, setPerformanceData] = useState<PerformanceData>({
     numberOfLocations: 50,
     averageRevenue: 1000000,
     improvementPercentage: 2.0
   })
 
-  // Calculate annual time savings for business case
-  const weeklyTimeSavingsDataAnalyst = timeSavingsData.dataAnalystCount * timeSavingsData.hoursPerWeekDataAnalyst
-  const annualTimeSavings = weeklyTimeSavingsDataAnalyst * timeSavingsData.hourlyRateDataAnalyst * 52
+  const hourlyRateDataAnalyst = timeSavingsData.annualSalaryDataAnalyst / (40 * 52)
+  
+  const monthlyTimeSavingsDataAnalyst = timeSavingsData.dataAnalystCount * timeSavingsData.hoursPerMonthDataAnalyst
+  const monthlyTimeSavingsCost = monthlyTimeSavingsDataAnalyst * hourlyRateDataAnalyst
+  
+  const annualTimeSavingsHours = monthlyTimeSavingsDataAnalyst * 12
+  const annualTimeSavings = monthlyTimeSavingsCost * 12
 
-  // Calculate annual performance improvement
-  const totalAnnualRevenue = performanceData.numberOfLocations * performanceData.averageRevenue
-  const annualPerformanceImprovement = totalAnnualRevenue * (performanceData.improvementPercentage / 100)
-
-  // Get Loop costs for business case
   const loopCosts = calculateLoopCosts(scorecardData.numberOfLocations, selectedModules)
 
-  // Function to handle tab navigation
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    // Scroll to the top of the container
     if (containerRef.current) {
       containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
-  // Function to navigate to the next tab
   const goToNextTab = () => {
     if (activeTab === "timeSavings") {
       setActiveTab("performance");
@@ -93,7 +86,6 @@ export default function RoiCalculator() {
       setActiveTab("businessCase");
     }
     
-    // Scroll to the top of the container
     if (containerRef.current) {
       containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -139,6 +131,10 @@ export default function RoiCalculator() {
             annualPerformanceImprovement={annualPerformanceImprovement}
             loopCosts={loopCosts}
             selectedModules={selectedModules}
+            monthlyTimeSavings={monthlyTimeSavingsCost}
+            monthlyTimeSavingsHours={monthlyTimeSavingsDataAnalyst}
+            annualTimeSavingsHours={annualTimeSavingsHours}
+            hourlyRate={hourlyRateDataAnalyst}
           />
         </TabsContent>
       </Tabs>

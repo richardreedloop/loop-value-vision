@@ -27,15 +27,14 @@ export default function TimeSavingsTab({ data, onChange, onNext }: TimeSavingsTa
     setLocalData((prev) => ({ ...prev, [field]: value }))
   }
 
-  // Calculate time savings for data analysts (scorecard production team)
-  const weeklyTimeSavingsDataAnalyst = localData.dataAnalystCount * localData.hoursPerWeekDataAnalyst
-  const weeklyCostSavingsDataAnalyst = weeklyTimeSavingsDataAnalyst * localData.hourlyRateDataAnalyst
-  const annualCostSavingsDataAnalyst = weeklyCostSavingsDataAnalyst * 52
+  // Calculate hourly rate from annual salary (assuming 40 hours per week, 52 weeks per year)
+  const hourlyRateDataAnalyst = localData.annualSalaryDataAnalyst / (40 * 52)
 
-  // Calculate total time and cost savings
-  const weeklyTimeSavingsTotal = weeklyTimeSavingsDataAnalyst
-  const annualHoursSaved = weeklyTimeSavingsTotal * 52
-  const annualCostSavingsTotal = annualCostSavingsDataAnalyst
+  // Calculate time savings for data analysts (scorecard production team)
+  const monthlyHoursSaved = localData.dataAnalystCount * localData.hoursPerMonthDataAnalyst
+  const annualHoursSaved = monthlyHoursSaved * 12
+  const monthlyCostSavings = monthlyHoursSaved * hourlyRateDataAnalyst
+  const annualCostSavings = monthlyCostSavings * 12
 
   // Calculate breakdown of savings
   const reportGenerationSavings = annualHoursSaved * 0.7 // 70% of time savings
@@ -71,29 +70,29 @@ export default function TimeSavingsTab({ data, onChange, onNext }: TimeSavingsTa
 
             <div className="space-y-2">
               <div className="flex justify-between">
-                <Label htmlFor="hoursPerWeekDataAnalyst">Hours Per Week: {localData.hoursPerWeekDataAnalyst}</Label>
+                <Label htmlFor="hoursPerMonthDataAnalyst">Hours Per Month: {localData.hoursPerMonthDataAnalyst}</Label>
               </div>
               <Slider
-                id="hoursPerWeekDataAnalyst"
-                min={1}
-                max={40}
-                step={0.5}
-                value={[localData.hoursPerWeekDataAnalyst]}
-                onValueChange={(value) => handleChange("hoursPerWeekDataAnalyst", value[0])}
+                id="hoursPerMonthDataAnalyst"
+                min={5}
+                max={100}
+                step={1}
+                value={[localData.hoursPerMonthDataAnalyst]}
+                onValueChange={(value) => handleChange("hoursPerMonthDataAnalyst", value[0])}
               />
-              <p className="text-sm text-slate-500">Hours spent weekly on creating and managing scorecards per person.</p>
+              <p className="text-sm text-slate-500">Hours spent monthly on creating and managing scorecards per person.</p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="hourlyRateDataAnalyst">Average Hourly Rate (£)</Label>
+              <Label htmlFor="annualSalaryDataAnalyst">Average Annual Salary (£)</Label>
               <Input
-                id="hourlyRateDataAnalyst"
+                id="annualSalaryDataAnalyst"
                 type="number"
-                min={1}
-                value={localData.hourlyRateDataAnalyst}
-                onChange={(e) => handleChange("hourlyRateDataAnalyst", Number(e.target.value))}
+                min={20000}
+                value={localData.annualSalaryDataAnalyst}
+                onChange={(e) => handleChange("annualSalaryDataAnalyst", Number(e.target.value))}
               />
-              <p className="text-sm text-slate-500">The average hourly cost for your scorecard production team.</p>
+              <p className="text-sm text-slate-500">The average annual salary for your scorecard production team.</p>
             </div>
           </div>
         </div>
@@ -104,16 +103,20 @@ export default function TimeSavingsTab({ data, onChange, onNext }: TimeSavingsTa
               <h3 className="text-lg font-medium mb-4">Estimated Time Savings</h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Weekly Time Saved:</span>
-                  <span className="font-medium">{weeklyTimeSavingsTotal.toLocaleString()} hours</span>
+                  <span className="text-slate-600">Monthly Time Saved:</span>
+                  <span className="font-medium">{monthlyHoursSaved.toLocaleString()} hours</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-slate-600">Annual Time Saved:</span>
                   <span className="font-medium">{annualHoursSaved.toLocaleString()} hours</span>
                 </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-600">Monthly Cost Saved:</span>
+                  <span className="font-medium">£{monthlyCostSavings.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                </div>
                 <div className="flex justify-between items-center pt-2 border-t">
                   <span className="text-slate-800 font-medium">Annual Cost Saved:</span>
-                  <span className="font-medium text-lg">£{annualCostSavingsTotal.toLocaleString()}</span>
+                  <span className="font-medium text-lg">£{annualCostSavings.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                 </div>
               </div>
             </CardContent>

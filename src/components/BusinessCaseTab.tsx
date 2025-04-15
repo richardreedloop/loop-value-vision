@@ -18,6 +18,10 @@ interface BusinessCaseTabProps {
   timeSavingsData: TimeSavingsData
   performanceData: PerformanceData
   annualTimeSavings: number
+  monthlyTimeSavings: number
+  monthlyTimeSavingsHours: number
+  annualTimeSavingsHours: number
+  hourlyRate: number
   annualPerformanceImprovement: number
   loopCosts: LoopCosts
   selectedModules: string[]
@@ -27,6 +31,9 @@ export default function BusinessCaseTab({
   timeSavingsData,
   performanceData,
   annualTimeSavings,
+  monthlyTimeSavings,
+  monthlyTimeSavingsHours,
+  annualTimeSavingsHours,
   annualPerformanceImprovement,
   loopCosts,
 }: BusinessCaseTabProps) {
@@ -35,12 +42,6 @@ export default function BusinessCaseTab({
   const firstYearROI = ((totalAnnualBenefit - loopCosts.firstYearTotal) / loopCosts.firstYearTotal) * 100
   const ongoingAnnualROI = ((totalAnnualBenefit - loopCosts.annualLicense) / loopCosts.annualLicense) * 100
   
-  // Calculate total weekly hours saved
-  const weeklyHoursSavedDataAnalyst = timeSavingsData.dataAnalystCount * timeSavingsData.hoursPerWeekDataAnalyst
-  const totalWeeklyHoursSaved = weeklyHoursSavedDataAnalyst
-  const totalMonthlyHoursSaved = totalWeeklyHoursSaved * 4.33 // Average weeks per month
-  const totalAnnualHoursSaved = totalWeeklyHoursSaved * 52
-
   // Get ROI color based on percentage
   const getRoiColor = (roiPercentage: number) => {
     if (roiPercentage < 0) return "text-red-600 bg-red-50"
@@ -66,18 +67,18 @@ export default function BusinessCaseTab({
 
   // Hours saved across a year chart data
   const hoursChartData = [
-    { month: 'Jan', hours: totalAnnualHoursSaved / 12 },
-    { month: 'Feb', hours: (totalAnnualHoursSaved / 12) * 2 },
-    { month: 'Mar', hours: (totalAnnualHoursSaved / 12) * 3 },
-    { month: 'Apr', hours: (totalAnnualHoursSaved / 12) * 4 },
-    { month: 'May', hours: (totalAnnualHoursSaved / 12) * 5 },
-    { month: 'Jun', hours: (totalAnnualHoursSaved / 12) * 6 },
-    { month: 'Jul', hours: (totalAnnualHoursSaved / 12) * 7 },
-    { month: 'Aug', hours: (totalAnnualHoursSaved / 12) * 8 },
-    { month: 'Sep', hours: (totalAnnualHoursSaved / 12) * 9 },
-    { month: 'Oct', hours: (totalAnnualHoursSaved / 12) * 10 },
-    { month: 'Nov', hours: (totalAnnualHoursSaved / 12) * 11 },
-    { month: 'Dec', hours: totalAnnualHoursSaved },
+    { month: 'Jan', hours: annualTimeSavingsHours / 12 },
+    { month: 'Feb', hours: (annualTimeSavingsHours / 12) * 2 },
+    { month: 'Mar', hours: (annualTimeSavingsHours / 12) * 3 },
+    { month: 'Apr', hours: (annualTimeSavingsHours / 12) * 4 },
+    { month: 'May', hours: (annualTimeSavingsHours / 12) * 5 },
+    { month: 'Jun', hours: (annualTimeSavingsHours / 12) * 6 },
+    { month: 'Jul', hours: (annualTimeSavingsHours / 12) * 7 },
+    { month: 'Aug', hours: (annualTimeSavingsHours / 12) * 8 },
+    { month: 'Sep', hours: (annualTimeSavingsHours / 12) * 9 },
+    { month: 'Oct', hours: (annualTimeSavingsHours / 12) * 10 },
+    { month: 'Nov', hours: (annualTimeSavingsHours / 12) * 11 },
+    { month: 'Dec', hours: annualTimeSavingsHours },
   ];
 
   // Revenue comparison data
@@ -138,7 +139,7 @@ export default function BusinessCaseTab({
                 {performanceData.numberOfLocations} locations would:
               </p>
               <ul className="space-y-2 list-disc pl-5 text-slate-700">
-                <li>Save {totalAnnualHoursSaved.toLocaleString()} hours annually</li>
+                <li>Save {annualTimeSavingsHours.toLocaleString()} hours annually</li>
                 <li>Generate £{annualPerformanceImprovement.toLocaleString()} in additional revenue</li>
                 <li>Provide a {firstYearROI.toFixed(0)}% ROI in the first year</li>
               </ul>
@@ -191,25 +192,29 @@ export default function BusinessCaseTab({
                   <div>
                     <span className="font-medium block">Monthly Hours Saved</span>
                   </div>
-                  <span className="font-bold">{totalMonthlyHoursSaved.toFixed(0)} hrs</span>
+                  <span className="font-bold">{monthlyTimeSavingsHours.toFixed(0)} hrs</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-slate-50 rounded-md">
                   <div>
                     <span className="font-medium block">Annual Hours Saved</span>
                   </div>
-                  <span className="font-bold">{totalAnnualHoursSaved.toLocaleString()} hrs</span>
+                  <span className="font-bold">{annualTimeSavingsHours.toLocaleString()} hrs</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-slate-50 rounded-md">
-                  <span className="font-medium">Time Savings Value</span>
-                  <span className="font-bold">£{annualTimeSavings.toLocaleString()}</span>
+                  <span className="font-medium">Monthly Cost Saved</span>
+                  <span className="font-bold">£{monthlyTimeSavings.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-slate-50 rounded-md">
+                  <span className="font-medium">Annual Cost Saved</span>
+                  <span className="font-bold">£{annualTimeSavings.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-slate-50 rounded-md">
                   <span className="font-medium">Annual Performance Improvement</span>
-                  <span className="font-bold">£{annualPerformanceImprovement.toLocaleString()}</span>
+                  <span className="font-bold">£{annualPerformanceImprovement.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-emerald-50 rounded-md">
                   <span className="font-medium">Total Annual Benefit</span>
-                  <span className="font-bold text-emerald-700">£{totalAnnualBenefit.toLocaleString()}</span>
+                  <span className="font-bold text-emerald-700">£{totalAnnualBenefit.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                 </div>
               </div>
 
