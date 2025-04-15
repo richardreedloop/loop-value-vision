@@ -70,17 +70,17 @@ export default function TimeSavingsTab({ data, onChange, onNext }: TimeSavingsTa
 
             <div className="space-y-2">
               <div className="flex justify-between">
-                <Label htmlFor="hoursPerMonthDataAnalyst">Hours Per Month: {localData.hoursPerMonthDataAnalyst}</Label>
+                <Label htmlFor="hoursPerMonthDataAnalyst">Hours Per Month Per Person: {localData.hoursPerMonthDataAnalyst}</Label>
               </div>
               <Slider
                 id="hoursPerMonthDataAnalyst"
-                min={5}
-                max={100}
+                min={1}
+                max={40}
                 step={1}
                 value={[localData.hoursPerMonthDataAnalyst]}
                 onValueChange={(value) => handleChange("hoursPerMonthDataAnalyst", value[0])}
               />
-              <p className="text-sm text-slate-500">Hours spent monthly on creating and managing scorecards per person.</p>
+              <p className="text-sm text-slate-500">Hours spent monthly per person on creating and managing scorecards.</p>
             </div>
 
             <div className="space-y-2">
@@ -110,13 +110,15 @@ export default function TimeSavingsTab({ data, onChange, onNext }: TimeSavingsTa
                   <span className="text-slate-600">Annual Time Saved:</span>
                   <span className="font-medium">{annualHoursSaved.toLocaleString()} hours</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Monthly Cost Saved:</span>
-                  <span className="font-medium">£{monthlyCostSavings.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-                </div>
-                <div className="flex justify-between items-center pt-2 border-t">
-                  <span className="text-slate-800 font-medium">Annual Cost Saved:</span>
-                  <span className="font-medium text-lg">£{annualCostSavings.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                <div className="pt-2 border-t">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Monthly Cost Saved:</span>
+                    <span className="font-medium">£{monthlyCostSavings.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                  </div>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-slate-800 font-medium">Annual Cost Saved:</span>
+                    <span className="font-medium text-lg">£{annualCostSavings.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                  </div>
                 </div>
               </div>
             </CardContent>

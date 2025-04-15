@@ -48,14 +48,14 @@ export default function RoiCalculator() {
   const [scorecardData, setScoreCardData] = useState<ScoreCardData>({
     numberOfLocations: 50,
     peopleCount: 3,
-    hoursPerMonth: 40,
+    hoursPerMonth: 30,
     annualCost: 75000,
   })
 
   const [timeSavingsData, setTimeSavingsData] = useState<TimeSavingsData>({
     numberOfLocations: 50,
     dataAnalystCount: 3,
-    hoursPerMonthDataAnalyst: 40,
+    hoursPerMonthDataAnalyst: 20,
     annualSalaryDataAnalyst: 60000
   })
 

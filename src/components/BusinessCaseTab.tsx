@@ -11,7 +11,7 @@ import {
   ChartTooltip, 
   ChartTooltipContent 
 } from "@/components/ui/chart"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis, BarChart, Bar } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, BarChart, Bar, ResponsiveContainer } from "recharts"
 import { useIsMobile } from "@/hooks/use-mobile"
 
 interface BusinessCaseTabProps {
@@ -81,22 +81,32 @@ export default function BusinessCaseTab({
     { month: 'Dec', hours: annualTimeSavingsHours },
   ];
 
-  // Revenue comparison data
+  // Revenue comparison data - more impactful visualization
   const baseRevenue = performanceData.numberOfLocations * performanceData.averageRevenue;
-  const improvedRevenue = baseRevenue + annualPerformanceImprovement;
+  const revenueWithTimeSavings = baseRevenue + annualTimeSavings;
+  const revenueWithBothImprovements = baseRevenue + totalAnnualBenefit;
   
   const revenueComparisonData = [
     { 
-      category: "Annual Revenue", 
-      "Without Loop": baseRevenue, 
-      "With Loop": improvedRevenue 
+      name: "Revenue Impact", 
+      "Current Revenue": baseRevenue,
+      "Time Savings": annualTimeSavings,
+      "Performance Improvement": annualPerformanceImprovement
     }
   ];
-
-  const areaChartConfig = {
-    savings: {
-      label: "Cumulative Savings",
+  
+  const stackedBarChartConfig = {
+    "Current Revenue": {
+      label: "Current Revenue",
+      color: "#011d29",
+    },
+    "Time Savings": {
+      label: "Time Savings",
       color: "#33b7b9",
+    },
+    "Performance Improvement": {
+      label: "Performance Improvement",
+      color: "#22F6AC",
     },
   } satisfies ChartConfig
 
@@ -104,17 +114,6 @@ export default function BusinessCaseTab({
     hours: {
       label: "Cumulative Hours Saved",
       color: "#011d29",
-    },
-  } satisfies ChartConfig
-
-  const revenueChartConfig = {
-    "Without Loop": {
-      label: "Without Loop",
-      color: "#011d29",
-    },
-    "With Loop": {
-      label: "With Loop",
-      color: "#22F6AC",
     },
   } satisfies ChartConfig
 
@@ -289,52 +288,80 @@ export default function BusinessCaseTab({
           </CardContent>
         </Card>
 
-        {/* Revenue Comparison Chart */}
+        {/* Revenue Comparison Chart - Improved for more impact */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Revenue Comparison</CardTitle>
+            <CardTitle className="text-lg">Revenue Impact</CardTitle>
           </CardHeader>
           <CardContent>
             <div className={`h-${isMobile ? '60' : '80'}`}>
-              <ChartContainer config={revenueChartConfig}>
-                <BarChart
-                  accessibilityLayer
-                  data={revenueComparisonData}
-                  margin={{
-                    top: 20,
-                    right: 20,
-                    left: 20,
-                    bottom: 20,
-                  }}
-                  width={isMobile ? 300 : 500}
-                  height={isMobile ? 200 : 300}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="category" tick={{ fontSize: isMobile ? 10 : 12 }} />
-                  <YAxis tick={{ fontSize: isMobile ? 10 : 12 }} tickFormatter={(value) => `£${(value / 1000000).toFixed(1)}M`} />
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                  <defs>
-                    <linearGradient id="fillWithoutLoop" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#011d29" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#011d29" stopOpacity={0.1} />
-                    </linearGradient>
-                    <linearGradient id="fillWithLoop" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#22F6AC" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#22F6AC" stopOpacity={0.1} />
-                    </linearGradient>
-                  </defs>
-                  <Bar 
-                    dataKey="Without Loop" 
-                    fillOpacity={0.8} 
-                    fill="url(#fillWithoutLoop)" 
-                  />
-                  <Bar 
-                    dataKey="With Loop" 
-                    fillOpacity={0.8} 
-                    fill="url(#fillWithLoop)" 
-                  />
-                </BarChart>
+              <ChartContainer config={stackedBarChartConfig}>
+                <ResponsiveContainer width="100%" height={isMobile ? 200 : 300}>
+                  <BarChart
+                    data={revenueComparisonData}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" hide={true} />
+                    <YAxis 
+                      tickFormatter={(value) => `£${(value / 1000000).toFixed(1)}M`} 
+                      domain={[0, baseRevenue + totalAnnualBenefit * 1.1]} // Ensure the max is slightly above total revenue
+                    />
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                    <Bar 
+                      dataKey="Current Revenue" 
+                      stackId="revenue" 
+                      fill="#011d29" 
+                      name="Current Revenue"
+                    />
+                    <Bar 
+                      dataKey="Time Savings" 
+                      stackId="revenue" 
+                      fill="#33b7b9" 
+                      name="Time Savings"
+                    />
+                    <Bar 
+                      dataKey="Performance Improvement" 
+                      stackId="revenue" 
+                      fill="#22F6AC" 
+                      name="Performance Improvement"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
               </ChartContainer>
+              
+              {/* Revenue comparison summary */}
+              <div className="mt-4 pt-4 border-t space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="flex items-center">
+                    <span className="inline-block w-3 h-3 bg-[#011d29] mr-2"></span>
+                    Current Annual Revenue
+                  </span>
+                  <span className="font-medium">£{baseRevenue.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="flex items-center">
+                    <span className="inline-block w-3 h-3 bg-[#33b7b9] mr-2"></span>
+                    Time Savings
+                  </span>
+                  <span className="font-medium">£{annualTimeSavings.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="flex items-center">
+                    <span className="inline-block w-3 h-3 bg-[#22F6AC] mr-2"></span>
+                    Performance Improvement
+                  </span>
+                  <span className="font-medium">£{annualPerformanceImprovement.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center pt-2 border-t">
+                  <span className="font-medium">Total Revenue with Loop</span>
+                  <span className="font-bold">£{revenueWithBothImprovements.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">Increase</span>
+                  <span className="font-bold text-emerald-600">+{((totalAnnualBenefit / baseRevenue) * 100).toFixed(1)}%</span>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
