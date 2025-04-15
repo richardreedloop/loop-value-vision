@@ -289,7 +289,7 @@ export default function BusinessCaseTab({
           </CardContent>
         </Card>
 
-        {/* Revenue Comparison Chart - New Bar Chart Implementation */}
+        {/* Revenue Comparison Chart - Bar Chart Implementation */}
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">Revenue Comparison</CardTitle>
@@ -365,4 +365,3 @@ export default function BusinessCaseTab({
     </div>
   )
 }
-
