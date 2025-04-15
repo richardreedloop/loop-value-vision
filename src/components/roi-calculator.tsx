@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useRef, useEffect } from "react"
@@ -34,6 +35,8 @@ export interface Module {
   title: string
   description: string
   price: number
+  name: string
+  required?: boolean
 }
 
 export default function RoiCalculator() {
@@ -69,6 +72,9 @@ export default function RoiCalculator() {
   
   const annualTimeSavingsHours = monthlyTimeSavingsDataAnalyst * 12
   const annualTimeSavings = monthlyTimeSavingsCost * 12
+
+  // Calculate performance improvement
+  const annualPerformanceImprovement = performanceData.numberOfLocations * performanceData.averageRevenue * (performanceData.improvementPercentage / 100)
 
   const loopCosts = calculateLoopCosts(scorecardData.numberOfLocations, selectedModules)
 
