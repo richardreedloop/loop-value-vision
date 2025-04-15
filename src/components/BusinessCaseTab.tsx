@@ -11,7 +11,7 @@ import {
   ChartTooltip, 
   ChartTooltipContent 
 } from "@/components/ui/chart"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, BarChart, Bar } from "recharts"
 import { useIsMobile } from "@/hooks/use-mobile"
 
 interface BusinessCaseTabProps {
@@ -81,24 +81,16 @@ export default function BusinessCaseTab({
     { month: 'Dec', hours: annualTimeSavingsHours },
   ];
 
-  // Revenue comparison data - original implementation
+  // Revenue comparison data - new bar chart implementation
   const baseRevenue = performanceData.numberOfLocations * performanceData.averageRevenue;
-  const revenueWithTimeSavings = baseRevenue + annualTimeSavings;
-  const revenueWithBothImprovements = baseRevenue + totalAnnualBenefit;
+  const revenueWithImprovements = baseRevenue + totalAnnualBenefit;
   
-  const revenueChartData = [
-    { month: 'Jan', savings: totalAnnualBenefit / 12 },
-    { month: 'Feb', savings: (totalAnnualBenefit / 12) * 2 },
-    { month: 'Mar', savings: (totalAnnualBenefit / 12) * 3 },
-    { month: 'Apr', savings: (totalAnnualBenefit / 12) * 4 },
-    { month: 'May', savings: (totalAnnualBenefit / 12) * 5 },
-    { month: 'Jun', savings: (totalAnnualBenefit / 12) * 6 },
-    { month: 'Jul', savings: (totalAnnualBenefit / 12) * 7 },
-    { month: 'Aug', savings: (totalAnnualBenefit / 12) * 8 },
-    { month: 'Sep', savings: (totalAnnualBenefit / 12) * 9 },
-    { month: 'Oct', savings: (totalAnnualBenefit / 12) * 10 },
-    { month: 'Nov', savings: (totalAnnualBenefit / 12) * 11 },
-    { month: 'Dec', savings: totalAnnualBenefit },
+  const revenueBarChartData = [
+    { 
+      name: "Annual Revenue", 
+      currentRevenue: baseRevenue,
+      improvedRevenue: revenueWithImprovements
+    }
   ];
   
   const savingsChartConfig = {
@@ -112,6 +104,17 @@ export default function BusinessCaseTab({
     hours: {
       label: "Cumulative Hours Saved",
       color: "#011d29",
+    },
+  } satisfies ChartConfig
+
+  const revenueChartConfig = {
+    currentRevenue: {
+      label: "Current Revenue",
+      color: "#4B5563",
+    },
+    improvedRevenue: {
+      label: "Improved Revenue",
+      color: "#22F6AC",
     },
   } satisfies ChartConfig
 
@@ -286,17 +289,17 @@ export default function BusinessCaseTab({
           </CardContent>
         </Card>
 
-        {/* Revenue Comparison Chart - Original Implementation */}
+        {/* Revenue Comparison Chart - New Bar Chart Implementation */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Revenue Impact</CardTitle>
+            <CardTitle className="text-lg">Revenue Comparison</CardTitle>
           </CardHeader>
           <CardContent>
             <div className={`h-${isMobile ? '60' : '80'}`}>
-              <ChartContainer config={savingsChartConfig}>
-                <AreaChart
+              <ChartContainer config={revenueChartConfig}>
+                <BarChart
                   accessibilityLayer
-                  data={revenueChartData}
+                  data={revenueBarChartData}
                   margin={{
                     top: 20,
                     right: 20,
@@ -306,48 +309,45 @@ export default function BusinessCaseTab({
                   width={isMobile ? 300 : 500}
                   height={isMobile ? 200 : 300}
                 >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" tick={{ fontSize: isMobile ? 10 : 12 }} />
-                  <YAxis tick={{ fontSize: isMobile ? 10 : 12 }} />
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                  <defs>
-                    <linearGradient id="fillSavings" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--color-savings)" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="var(--color-savings)" stopOpacity={0.1} />
-                    </linearGradient>
-                  </defs>
-                  <Area
-                    dataKey="savings"
-                    type="monotone"
-                    fill="url(#fillSavings)"
-                    fillOpacity={0.6}
-                    stroke="var(--color-savings)"
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fontSize: isMobile ? 10 : 12 }} />
+                  <YAxis 
+                    tickFormatter={(value) => `£${(value / 1000000).toFixed(1)}M`}
+                    tick={{ fontSize: isMobile ? 10 : 12 }}
+                    domain={[0, 'dataMax']}
                   />
-                </AreaChart>
+                  <ChartTooltip 
+                    cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }} 
+                    formatter={(value) => [`£${Number(value).toLocaleString()}`, ""]}
+                  />
+                  <Bar 
+                    dataKey="currentRevenue" 
+                    fill="var(--color-currentRevenue)"
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar 
+                    dataKey="improvedRevenue" 
+                    fill="var(--color-improvedRevenue)"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
               </ChartContainer>
               
               {/* Revenue comparison summary */}
               <div className="mt-4 pt-4 border-t space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="flex items-center">
-                    <span className="inline-block w-3 h-3 bg-[#011d29] mr-2"></span>
+                    <span className="inline-block w-3 h-3 bg-[#4B5563] mr-2"></span>
                     Current Annual Revenue
                   </span>
                   <span className="font-medium">£{baseRevenue.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="flex items-center">
-                    <span className="inline-block w-3 h-3 bg-[#33b7b9] mr-2"></span>
-                    Revenue with Time Savings
-                  </span>
-                  <span className="font-medium">£{revenueWithTimeSavings.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="flex items-center">
                     <span className="inline-block w-3 h-3 bg-[#22F6AC] mr-2"></span>
-                    Revenue with All Improvements
+                    Improved Annual Revenue
                   </span>
-                  <span className="font-medium">£{revenueWithBothImprovements.toLocaleString()}</span>
+                  <span className="font-medium">£{revenueWithImprovements.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center pt-2 border-t">
                   <span className="font-medium">Total Revenue Increase</span>
