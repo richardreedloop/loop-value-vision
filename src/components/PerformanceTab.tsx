@@ -63,14 +63,14 @@ export default function PerformanceTab({ data, onChange, onNext }: PerformanceTa
             </div>
             <Slider
               id="improvementPercentage"
-              min={2}
+              min={0.1}
               max={10}
               step={0.1}
               value={[localData.improvementPercentage]}
               onValueChange={(value) => handleChange("improvementPercentage", value[0])}
             />
             <p className="text-sm text-slate-500">
-              Loop customers typically see a 2-10% annual incremental improvement in parts revenue.
+              Loop customers typically see a 0.1-10% annual incremental improvement in parts revenue.
             </p>
           </div>
         </div>
