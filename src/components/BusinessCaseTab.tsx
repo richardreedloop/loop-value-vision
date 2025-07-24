@@ -2,9 +2,10 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mail, Phone, Calendar, ExternalLink, TrendingUp } from "lucide-react"
-import type { TimeSavingsData, PerformanceData } from "./roi-calculator"
-import type { LoopCosts } from "@/lib/cost-calculator"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { TrendingUp } from "lucide-react"
+import type { TimeSavingsData, PerformanceData, UserCosts } from "./roi-calculator"
 import { 
   ChartConfig, 
   ChartContainer, 
@@ -13,6 +14,12 @@ import {
 } from "@/components/ui/chart"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, BarChart, Bar } from "recharts"
 import { useIsMobile } from "@/hooks/use-mobile"
+
+interface CalculatedCosts {
+  setupFee: number
+  annualLicense: number
+  firstYearTotal: number
+}
 
 interface BusinessCaseTabProps {
   timeSavingsData: TimeSavingsData
@@ -23,8 +30,9 @@ interface BusinessCaseTabProps {
   annualTimeSavingsHours: number
   hourlyRate: number
   annualPerformanceImprovement: number
-  loopCosts: LoopCosts
-  selectedModules: string[]
+  userCosts: UserCosts
+  onCostsChange: (costs: UserCosts) => void
+  calculatedCosts: CalculatedCosts
 }
 
 export default function BusinessCaseTab({
@@ -35,12 +43,14 @@ export default function BusinessCaseTab({
   monthlyTimeSavingsHours,
   annualTimeSavingsHours,
   annualPerformanceImprovement,
-  loopCosts,
+  userCosts,
+  onCostsChange,
+  calculatedCosts,
 }: BusinessCaseTabProps) {
   const isMobile = useIsMobile()
   const totalAnnualBenefit = annualTimeSavings + annualPerformanceImprovement
-  const firstYearROI = ((totalAnnualBenefit - loopCosts.firstYearTotal) / loopCosts.firstYearTotal) * 100
-  const ongoingAnnualROI = ((totalAnnualBenefit - loopCosts.annualLicense) / loopCosts.annualLicense) * 100
+  const firstYearROI = calculatedCosts.firstYearTotal > 0 ? ((totalAnnualBenefit - calculatedCosts.firstYearTotal) / calculatedCosts.firstYearTotal) * 100 : 0
+  const ongoingAnnualROI = calculatedCosts.annualLicense > 0 ? ((totalAnnualBenefit - calculatedCosts.annualLicense) / calculatedCosts.annualLicense) * 100 : 0
   
   // Get ROI color based on percentage
   const getRoiColor = (roiPercentage: number) => {
@@ -82,7 +92,7 @@ export default function BusinessCaseTab({
   ];
 
   // Revenue comparison data - new bar chart implementation
-  const baseRevenue = performanceData.numberOfLocations * performanceData.averageRevenue;
+  const baseRevenue = performanceData.annualPartsRevenue;
   const revenueWithImprovements = baseRevenue + totalAnnualBenefit;
   
   const revenueBarChartData = [
@@ -129,50 +139,68 @@ export default function BusinessCaseTab({
 
       {/* Main content grid */}
       <div className={`grid gap-6 ${isMobile ? "" : "md:grid-cols-2"}`}>
-        {/* Left column - Executive Summary and Next Steps */}
+        {/* Left column - Cost Inputs */}
         <div className="space-y-6">
-          <Card className="border-emerald-100 bg-emerald-50">
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-medium mb-4">Executive Summary</h3>
-              <p className="text-slate-700 mb-4">
-                Based on your inputs, implementing Loop's solution for{" "}
-                {performanceData.numberOfLocations} locations would:
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="text-lg">Implementation Costs</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <p className="text-slate-600">
+                Enter your implementation costs to calculate ROI and financial projections.
               </p>
-              <ul className="space-y-2 list-disc pl-5 text-slate-700">
-                <li>Save {annualTimeSavingsHours.toLocaleString()} hours annually</li>
-                <li>Generate £{annualPerformanceImprovement.toLocaleString()} in additional revenue</li>
-                <li>Provide a {firstYearROI.toFixed(0)}% ROI in the first year</li>
-              </ul>
-            </CardContent>
-          </Card>
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="oneOffCost">One-off Implementation Cost (£)</Label>
+                  <Input
+                    id="oneOffCost"
+                    type="text"
+                    value={userCosts.oneOffCost ? userCosts.oneOffCost.toLocaleString() : ""}
+                    onChange={(e) => {
+                      const numericValue = e.target.value.replace(/,/g, '');
+                      onCostsChange({
+                        ...userCosts,
+                        oneOffCost: Number(numericValue) || 0
+                      });
+                    }}
+                    placeholder="Enter one-off cost"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="monthlyCost">Monthly Cost (£)</Label>
+                  <Input
+                    id="monthlyCost"
+                    type="text"
+                    value={userCosts.monthlyCost ? userCosts.monthlyCost.toLocaleString() : ""}
+                    onChange={(e) => {
+                      const numericValue = e.target.value.replace(/,/g, '');
+                      onCostsChange({
+                        ...userCosts,
+                        monthlyCost: Number(numericValue) || 0
+                      });
+                    }}
+                    placeholder="Enter monthly cost"
+                  />
+                </div>
+              </div>
 
-          <Card className="border-[#33b7b9]/20 bg-[#33b7b9]/5">
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-medium mb-4">Next Steps</h3>
-              <p className="text-slate-700 mb-4">
-                Ready to see these potential savings in action? Book a demo of Loop and we'll show 
-                you how you can save time and improve performance across your locations.
-              </p>
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-sm">
-                  <Mail className="h-4 w-4 text-[#011d29]" />
-                  <a href="mailto:tom.berry@loop-software.com" className="text-[#011d29]">
-                    tom.berry@loop-software.com
-                  </a>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Phone className="h-4 w-4 text-[#011d29]" />
-                  <a href="tel:07469356639" className="text-[#011d29]">
-                    07469 356 639
-                  </a>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Calendar className="h-4 w-4 text-[#011d29]" />
-                  <a href="https://meetings-eu1.hubspot.com/tberry/intro" 
-                     target="_blank" rel="noopener noreferrer" 
-                     className="text-[#011d29] flex items-center">
-                    Schedule a meeting <ExternalLink className="h-3 w-3 ml-1" />
-                  </a>
+              <div className="space-y-3 pt-4 border-t">
+                <h4 className="font-medium text-slate-800">Cost Summary:</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center p-3 bg-slate-50 rounded-md">
+                    <span className="font-medium">One-off Cost</span>
+                    <span className="font-bold">£{calculatedCosts.setupFee.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-slate-50 rounded-md">
+                    <span className="font-medium">Annual License Cost</span>
+                    <span className="font-bold">£{calculatedCosts.annualLicense.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-md">
+                    <span className="font-medium">First Year Total</span>
+                    <span className="font-bold text-blue-700">£{calculatedCosts.firstYearTotal.toLocaleString()}</span>
+                  </div>
                 </div>
               </div>
             </CardContent>

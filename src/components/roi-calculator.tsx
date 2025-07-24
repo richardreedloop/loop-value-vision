@@ -11,23 +11,18 @@ import { useIsMobile } from "@/hooks/use-mobile"
 
 // Define types for use in the tabs
 export interface TimeSavingsData {
-  numberOfLocations: number
-  dataAnalystCount: number
   hoursPerMonthDataAnalyst: number
   annualSalaryDataAnalyst: number
 }
 
 export interface PerformanceData {
-  numberOfLocations: number
-  averageRevenue: number
+  annualPartsRevenue: number
   improvementPercentage: number
 }
 
-export interface ScoreCardData {
-  numberOfLocations: number
-  peopleCount: number
-  hoursPerMonth: number
-  annualCost: number
+export interface UserCosts {
+  oneOffCost: number
+  monthlyCost: number
 }
 
 export interface Module {
@@ -41,42 +36,41 @@ export interface Module {
 
 export default function RoiCalculator() {
   const [activeTab, setActiveTab] = useState("timeSavings")
-  const [selectedModules] = useState<string[]>(["core", "scorecard"])
   const containerRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
   
-  const [scorecardData, setScoreCardData] = useState<ScoreCardData>({
-    numberOfLocations: 50,
-    peopleCount: 3,
-    hoursPerMonth: 30,
-    annualCost: 75000,
-  })
-
   const [timeSavingsData, setTimeSavingsData] = useState<TimeSavingsData>({
-    numberOfLocations: 50,
-    dataAnalystCount: 3,
-    hoursPerMonthDataAnalyst: 20,
-    annualSalaryDataAnalyst: 60000
+    hoursPerMonthDataAnalyst: 60,
+    annualSalaryDataAnalyst: 50000
   })
 
   const [performanceData, setPerformanceData] = useState<PerformanceData>({
-    numberOfLocations: 50,
-    averageRevenue: 1000000,
+    annualPartsRevenue: 74000000,
     improvementPercentage: 2.0
+  })
+
+  const [userCosts, setUserCosts] = useState<UserCosts>({
+    oneOffCost: 25500,
+    monthlyCost: 7500
   })
 
   const hourlyRateDataAnalyst = timeSavingsData.annualSalaryDataAnalyst / (40 * 52)
   
-  const monthlyTimeSavingsDataAnalyst = timeSavingsData.dataAnalystCount * timeSavingsData.hoursPerMonthDataAnalyst
-  const monthlyTimeSavingsCost = monthlyTimeSavingsDataAnalyst * hourlyRateDataAnalyst
+  const monthlyTimeSavingsHours = timeSavingsData.hoursPerMonthDataAnalyst
+  const monthlyTimeSavingsCost = monthlyTimeSavingsHours * hourlyRateDataAnalyst
   
-  const annualTimeSavingsHours = monthlyTimeSavingsDataAnalyst * 12
+  const annualTimeSavingsHours = monthlyTimeSavingsHours * 12
   const annualTimeSavings = monthlyTimeSavingsCost * 12
 
   // Calculate performance improvement
-  const annualPerformanceImprovement = performanceData.numberOfLocations * performanceData.averageRevenue * (performanceData.improvementPercentage / 100)
+  const annualPerformanceImprovement = performanceData.annualPartsRevenue * (performanceData.improvementPercentage / 100)
 
-  const loopCosts = calculateLoopCosts(scorecardData.numberOfLocations, selectedModules)
+  // Calculate costs
+  const calculatedCosts = {
+    setupFee: userCosts.oneOffCost,
+    annualLicense: userCosts.monthlyCost * 12,
+    firstYearTotal: userCosts.oneOffCost + (userCosts.monthlyCost * 12)
+  }
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -98,11 +92,16 @@ export default function RoiCalculator() {
   }
 
   return (
-    <div ref={containerRef} className="bg-white rounded-lg shadow-md p-6 max-w-6xl mx-auto">
+    <div ref={containerRef} className="bg-white rounded-lg shadow-md p-6 max-w-6xl mx-auto relative">
+      {/* Logo in top right */}
+      <div className="absolute top-4 right-4 z-10">
+        <img src="/man.png" alt="Loop Logo" className="h-24 w-auto" />
+      </div>
+      
       <div className="mb-6">
         <h2 className="text-2xl font-bold mb-2">Loop ROI Calculator</h2>
         <p className="text-slate-600">
-          Estimate the benefits of implementing Loop's solutions for your business.
+          Estimate the benefits of implementing Loop's solutions for MAN.
         </p>
       </div>
 
@@ -134,13 +133,14 @@ export default function RoiCalculator() {
             timeSavingsData={timeSavingsData}
             performanceData={performanceData}
             annualTimeSavings={annualTimeSavings}
-            annualPerformanceImprovement={annualPerformanceImprovement}
-            loopCosts={loopCosts}
-            selectedModules={selectedModules}
             monthlyTimeSavings={monthlyTimeSavingsCost}
-            monthlyTimeSavingsHours={monthlyTimeSavingsDataAnalyst}
+            monthlyTimeSavingsHours={monthlyTimeSavingsHours}
             annualTimeSavingsHours={annualTimeSavingsHours}
             hourlyRate={hourlyRateDataAnalyst}
+            annualPerformanceImprovement={annualPerformanceImprovement}
+            userCosts={userCosts}
+            onCostsChange={setUserCosts}
+            calculatedCosts={calculatedCosts}
           />
         </TabsContent>
       </Tabs>
