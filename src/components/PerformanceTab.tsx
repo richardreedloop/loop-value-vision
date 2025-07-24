@@ -70,7 +70,7 @@ export default function PerformanceTab({ data, onChange, onNext }: PerformanceTa
               onValueChange={(value) => handleChange("improvementPercentage", value[0])}
             />
             <p className="text-sm text-slate-500">
-              Loop customers typically see a 0.1-10% annual incremental improvement in parts revenue.
+              Loop customers typically see a 2-10% annual incremental improvement in parts revenue.
             </p>
           </div>
         </div>
