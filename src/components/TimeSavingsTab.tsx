@@ -28,7 +28,7 @@ export default function TimeSavingsTab({ data, onChange, onNext }: TimeSavingsTa
   }
 
   // Calculate hourly rate from annual salary (assuming 40 hours per week, 52 weeks per year)
-  const hourlyRateDataAnalyst = localData.annualSalaryDataAnalyst / (40 * 52)
+  const hourlyRateDataAnalyst = localData.annualSalaryDataAnalyst > 0 ? localData.annualSalaryDataAnalyst / (40 * 52) : 0
 
   // Calculate time savings - now using only hours per month directly
   const monthlyHoursSaved = localData.hoursPerMonthDataAnalyst
@@ -69,14 +69,19 @@ export default function TimeSavingsTab({ data, onChange, onNext }: TimeSavingsTa
               <Input
                 id="annualSalaryDataAnalyst"
                 type="text"
-                value={localData.annualSalaryDataAnalyst.toLocaleString()}
+                value={localData.annualSalaryDataAnalyst > 0 ? localData.annualSalaryDataAnalyst.toLocaleString() : ""}
                 onChange={(e) => {
                   const numericValue = e.target.value.replace(/,/g, '');
-                  const value = Number(numericValue);
-                  if (!isNaN(value) && value >= 20000) {
-                    handleChange("annualSalaryDataAnalyst", value);
+                  if (numericValue === '') {
+                    handleChange("annualSalaryDataAnalyst", 0);
+                  } else {
+                    const value = Number(numericValue);
+                    if (!isNaN(value) && value >= 0) {
+                      handleChange("annualSalaryDataAnalyst", value);
+                    }
                   }
                 }}
+                placeholder="Enter annual salary"
               />
               <p className="text-sm text-slate-500">The average annual salary for your scorecard production team.</p>
             </div>

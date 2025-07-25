@@ -40,8 +40,8 @@ export default function RoiCalculator() {
   const isMobile = useIsMobile()
   
   const [timeSavingsData, setTimeSavingsData] = useState<TimeSavingsData>({
-    hoursPerMonthDataAnalyst: 60,
-    annualSalaryDataAnalyst: 50000
+    hoursPerMonthDataAnalyst: 80,
+    annualSalaryDataAnalyst: 60000
   })
 
   const [performanceData, setPerformanceData] = useState<PerformanceData>({
