@@ -51,7 +51,7 @@ export default function RoiCalculator() {
 
   const [userCosts, setUserCosts] = useState<UserCosts>({
     oneOffCost: 25500,
-    monthlyCost: 7500
+    monthlyCost: 5000
   })
 
   const hourlyRateDataAnalyst = timeSavingsData.annualSalaryDataAnalyst / (40 * 52)
